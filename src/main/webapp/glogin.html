@@ -1,28 +1,47 @@
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id" content="927375242383-t21v9ml38tkh2pr30m4hqiflkl3jfohl.apps.googleusercontent.com">
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-  </head>
-  <body>
-    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+<head>
+    <meta charset="UTF-8">
+    <title>Google Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <meta name="google-signin-client_id" content="144966531082-9vskt0sg6l8m9gbj7g993u2rgagd5qii.apps.googleusercontent.com">
     <script>
-      function onSignIn(googleUser) {
-        // Useful data for your client-side scripts:
-        var profile = googleUser.getBasicProfile();
-        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-        console.log('Full Name: ' + profile.getName());
-        console.log('Given Name: ' + profile.getGivenName());
-        console.log('Family Name: ' + profile.getFamilyName());
-        console.log("Image URL: " + profile.getImageUrl());
-        console.log("Email: " + profile.getEmail());
+        // Google Sign-In Initialization
+        function handleCredentialResponse(response) {
+            const data = parseJwt(response.credential);
+            localStorage.setItem('userName', data.name); // Store the name in local storage
+            localStorage.setItem('credential', response.credential); // Store the credential
+            console.log('Logged in as:', data.name);
+            window.location.href = 'index3.html'; // Redirect to index3.html
+        }
 
-        // The ID token you need to pass to your backend:
-        var id_token = googleUser.getAuthResponse().id_token;
-        console.log("ID Token: " + id_token);
-      }
+        // Function to decode JWT token
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = decodeURIComponent(atob(base64Url).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(base64);
+        }
+
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: "144966531082-9vskt0sg6l8m9gbj7g993u2rgagd5qii.apps.googleusercontent.com",
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("g_id_signin"),
+                { theme: "outline", size: "large" }  // Custom button parameters
+            );
+        }
     </script>
-  </body>
+</head>
+<body>
+    <h1>Login to the Dice Game</h1>
+    <!-- Google Sign-In Button -->
+    <div id="g_id_signin"></div>
+</body>
 </html>
-
-
